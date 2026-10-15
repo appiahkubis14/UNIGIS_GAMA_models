@@ -1,0 +1,78 @@
+/**
+* Name: savana
+* Based on the internal empty template.
+* Author: samuel-appiah-kubi
+* Tags:
+*/
+
+model savana
+
+global {
+    // Initial number of animals
+    int num_lions <- 20;
+    int num_zebras <- 20;
+
+    // Movement speed (in meters per step)
+    float lion_speed <- 1.0;
+    float zebra_speed <- 1.0;
+
+    // Size of the environment
+    float world_size <- 100.0;
+    geometry shape <- square(world_size);
+
+    init {
+        // Agents are placed at random locations inside the world by default
+        create lion number: num_lions;
+        create zebra number: num_zebras;
+    }
+}
+
+// ==================== LION SPECIES ====================
+species lion skills: [moving] {
+
+    // Random wandering; 'wander' keeps the agent inside the world automatically
+    reflex walk {
+        do wander amplitude: 40.0 speed: lion_speed;
+    }
+
+    // Lion kills any zebra within 3 m
+    reflex hunt {
+        ask zebra at_distance 3.0 {
+            do die;
+        }
+    }
+
+    aspect base {
+        draw circle(3.0) color: #orange;
+    }
+}
+
+// ==================== ZEBRA SPECIES ====================
+species zebra skills: [moving] {
+
+    reflex walk {
+        do wander amplitude: 40.0 speed: zebra_speed;
+    }
+
+    aspect base {
+        draw triangle(2.0) color: #grey;
+    }
+}
+
+// ==================== EXPERIMENT ====================
+experiment Savannah type: gui {
+    parameter "Number of lions" var: num_lions min: 1 max: 200;
+    parameter "Number of zebras" var: num_zebras min: 1 max: 200;
+
+    output {
+        display SavannahDisplay type: opengl {
+            species zebra aspect: base;
+            species lion aspect: base;
+
+            graphics "Stats" {
+                draw "Lions: " + length(lion) at: {5, 5} color: #orange font: font("Arial", 16, #bold);
+                draw "Zebras: " + length(zebra) at: {5, 12} color: #grey font: font("Arial", 16, #bold);
+            }
+        }
+    }
+}

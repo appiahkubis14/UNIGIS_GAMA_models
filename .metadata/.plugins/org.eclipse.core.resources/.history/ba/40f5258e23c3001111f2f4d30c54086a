@@ -1,0 +1,121 @@
+/**
+* Name: savana
+* Based on the internal empty template. 
+* Author: samuel-appiah-kubi
+* Tags: 
+*/
+
+
+model savana
+
+/* Insert your model definition here */
+
+
+global {
+    // Initial number of animals
+    int num_lions <- 20;
+    int num_zebras <- 20;
+    
+    // Movement speed (in meters per step)
+    float lion_speed <- 1.0;
+    float zebra_speed <- 1.0;
+    
+    // Size of the environment (world is 100x100 by default)
+    float world_size <- 100.0;
+    
+    // Initialize the simulation
+    init {
+        // Create lions at random positions
+        create lion number: num_lions {
+            location <- {rnd(0, world_size), rnd(0, world_size)};
+            heading <- rnd(0, 360);
+        }
+        
+        // Create zebras at random positions
+        create zebra number: num_zebras {
+            location <- {rnd(0, world_size), rnd(0, world_size)};
+            heading <- rnd(0, 360);
+        }
+    }
+}
+
+// ==================== LION SPECIES ====================
+species lion skills: [moving] {
+    
+    // Lion walks randomly
+    reflex walk {
+        // Randomly change heading a bit to make movement look wandering
+        heading <- heading + rnd(-20.0, 20.0);
+        
+        // Move forward
+        do goto target: location + {cos(heading) * lion_speed, sin(heading) * lion_speed};
+        
+        // Bounce off the world boundary
+        if (location.x < 0 or location.x > world_size or 
+            location.y < 0 or location.y > world_size) {
+            heading <- heading + 180.0;
+            location <- {min(max(location.x, 0), world_size),
+                         min(max(location.y, 0), world_size)};
+        }
+    }
+    
+    // Lion kills a zebra upon contact
+    reflex hunt when: (zebra overlapping self) {
+        // "self" is the lion
+        ask (zebra overlapping self) {
+            do die;
+        }
+    }
+    
+    // Visualisation: orange circle of size 3
+    aspect base {
+        draw circle(3.0) color: #orange;
+    }
+}
+
+// ==================== ZEBRA SPECIES ====================
+species zebra skills: [moving] {
+    
+    // Zebra walks randomly
+    reflex walk {
+        // Randomly change heading a bit
+        heading <- heading + rnd(-20.0, 20.0);
+        
+        // Move forward
+        do goto target: location + {cos(heading) * zebra_speed, sin(heading) * zebra_speed};
+        
+        // Bounce off the world boundary
+        if (location.x < 0 or location.x > world_size or 
+            location.y < 0 or location.y > world_size) {
+            heading <- heading + 180.0;
+            location <- {min(max(location.x, 0), world_size),
+                         min(max(location.y, 0), world_size)};
+        }
+    }
+    
+    // Visualisation: grey triangle of size 2
+    aspect base {
+        draw triangle(2.0) color: #grey;
+    }
+}
+
+// ==================== EXPERIMENT ====================
+experiment Savannah type: gui {
+    
+    output {
+        display SavannahDisplay type: opengl {
+            // Draw zebras first (background layer)
+            species zebra aspect: base;
+            // Draw lions on top
+            species lion aspect: base;
+            
+            // Display counters
+            graphics "Stats" {
+                draw text: "Lions: " + length(lion)
+                    at: {10, 10} color: #orange size: 16;
+                draw text: "Zebras: " + length(zebra)
+                    at: {10, 30} color: #grey size: 16;
+            }
+        }
+    }
+}
