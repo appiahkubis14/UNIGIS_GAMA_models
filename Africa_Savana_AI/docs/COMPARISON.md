@@ -1,7 +1,7 @@
 # Step 3 – Comparison: hand-written vs. AI implementation
 
-- **Hand-written:** `Africa_Savana/models/savana_ca.gaml` (commit `32eb7a4`, Unit 1)
-- **AI:** `Africa_Savana_AI/models/savannah_ai.gaml` after features 1–4 (commit `beaeb16`)
+- **Hand-written:** `Africa_Savana/models/savana_ca.gaml` (Unit 1 version, before the editor-warning fix included in commit `4d48022`)
+- **AI:** `Africa_Savana_AI/models/savannah_ai.gaml` after features 1–4 (commit `41148ab`)
 
 Both compile in GAMA 2025.6.4. Both were run headless with seed 1.0: lions
 stay at 20, zebras only decrease, and total biomass rises by exactly
