@@ -28,6 +28,10 @@ global {
 	float grass_growth_rate <- 0.1;     // kg per cell per step
 	float biomass_full_colour <- 30.0;  // kg at which a cell is fully dark green
 
+	// ---- Monitored values (O4, O5) ----
+	float total_biomass <- 0.0 update: sum(grassland collect each.biomass);
+	float mean_biomass <- 0.0 update: total_biomass / length(grassland);
+
 	// E1: the default GAMA world is already 100 m x 100 m, so 'shape' is not redefined.
 
 	// A1: random initial locations are GAMA's default for 'create'.
@@ -105,11 +109,41 @@ grid grassland width: 50 height: 50 neighbors: 4 {
 // EXPERIMENT
 // =====================================================================
 experiment Savannah type: gui {
+
+	// O1
+	parameter "Number of lions" var: nb_lions min: 1 max: 200 category: "Animals";
+	parameter "Number of zebras" var: nb_zebras min: 1 max: 200 category: "Animals";
+	parameter "Lion speed (m/step)" var: lion_speed min: 0.1 max: 5.0 category: "Animals";
+	parameter "Zebra speed (m/step)" var: zebra_speed min: 0.1 max: 5.0 category: "Animals";
+	parameter "Grass growth (kg/step)" var: grass_growth_rate min: 0.0 max: 1.0 category: "Grass";
+
 	output {
+		// O2: grass below, zebras, lions on top
 		display SavannahMap type: opengl {
 			grid grassland;
 			species zebra aspect: base;
 			species lion aspect: base;
 		}
+
+		// O3
+		display Populations type: 2d {
+			chart "Animal populations" type: series {
+				data "Lions" value: length(lion) color: #orange;
+				data "Zebras" value: length(zebra) color: #grey;
+			}
+		}
+
+		// O4
+		display Grass type: 2d {
+			chart "Mean biomass per cell (kg)" type: series {
+				data "Mean biomass" value: mean_biomass color: #darkgreen;
+			}
+		}
+
+		// O5
+		monitor "Lions" value: length(lion);
+		monitor "Zebras" value: length(zebra);
+		monitor "Total biomass (kg)" value: total_biomass with_precision 1;
+		monitor "Mean biomass (kg)" value: mean_biomass with_precision 2;
 	}
 }
