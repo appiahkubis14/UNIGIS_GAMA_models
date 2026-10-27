@@ -21,11 +21,12 @@ global {
     float avg_speed <- 0.0;
     int collision_count <- 0;
 
-    // World spans [0, world_size] in x and y (GAMA does not allow negative world coordinates)
-    geometry shape <- square(world_size);
-
     // ==================== INITIALIZATION ====================
     init {
+        // World spans [0, world_size] in x and y (GAMA does not allow negative world coordinates).
+        // 'shape' is the built-in world attribute, so it is assigned, not redeclared.
+        shape <- square(world_size);
+
         create particle number: num_particles {
             radius <- rnd(min_radius, max_radius);
             mass <- 4.0 / 3.0 * #pi * radius ^ 3 * 1000.0;
