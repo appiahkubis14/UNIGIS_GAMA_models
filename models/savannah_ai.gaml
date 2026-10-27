@@ -27,6 +27,7 @@ global {
 	float initial_biomass_max <- 10.0;  // kg
 	float grass_growth_rate <- 0.1;     // kg per cell per step
 	float biomass_full_colour <- 30.0;  // kg at which a cell is fully dark green
+	float zebra_grazing <- 0.5;         // X1: kg a zebra eats per step from its cell
 
 	// ---- Monitored values (O4, O5) ----
 	float total_biomass <- 0.0 update: sum(grassland collect each.biomass);
@@ -72,6 +73,12 @@ species zebra skills: [moving] {
 		do wander amplitude: wander_amplitude speed: zebra_speed;
 	}
 
+	// X1: eat from the cell under the zebra, never below 0 kg.
+	reflex graze {
+		grassland cell <- grassland(location);
+		cell.biomass <- cell.biomass - min(zebra_grazing, cell.biomass);
+	}
+
 	aspect base {  // A4
 		draw triangle(2.0) color: #grey border: #black;
 	}
@@ -112,6 +119,7 @@ experiment Savannah type: gui {
 	parameter "Lion speed (m/step)" var: lion_speed min: 0.1 max: 5.0 category: "Animals";
 	parameter "Zebra speed (m/step)" var: zebra_speed min: 0.1 max: 5.0 category: "Animals";
 	parameter "Grass growth (kg/step)" var: grass_growth_rate min: 0.0 max: 1.0 category: "Grass";
+	parameter "Zebra grazing (kg/step)" var: zebra_grazing min: 0.0 max: 5.0 category: "Grass";  // X6
 
 	output {
 		// O2: grass below, zebras, lions on top
