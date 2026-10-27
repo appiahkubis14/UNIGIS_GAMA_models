@@ -45,18 +45,13 @@ global {
 // SPECIES
 // =====================================================================
 
-// A2: shared random walk; 'wander' keeps agents inside the world.
-species animal skills: [moving] {
-	float walk_speed;
+// A2: random walk; 'wander' keeps agents inside the world.
+// The speed is read from the global every step so that changing the
+// parameter during a run affects agents that already exist.
+species lion skills: [moving] {
 
 	reflex walk {
-		do wander amplitude: wander_amplitude speed: walk_speed;
-	}
-}
-
-species lion parent: animal {
-	init {
-		walk_speed <- lion_speed;
+		do wander amplitude: wander_amplitude speed: lion_speed;
 	}
 
 	// A3: every zebra the lion runs into is killed in the same step.
@@ -71,9 +66,10 @@ species lion parent: animal {
 	}
 }
 
-species zebra parent: animal {
-	init {
-		walk_speed <- zebra_speed;
+species zebra skills: [moving] {
+
+	reflex walk {
+		do wander amplitude: wander_amplitude speed: zebra_speed;
 	}
 
 	aspect base {  // A4
