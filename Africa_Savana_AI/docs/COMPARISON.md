@@ -17,6 +17,7 @@ stay at 20, zebras only decrease, and total biomass rises by exactly
 | 4 | Cell colour | `rgb color <- … update: …` redeclares the built-in `color` (editor info marker) | assigns built-in `color` in `init` and in `reflex grow` | AI better, see 5 |
 | 5 | Colour timing | `update:` runs **before** `reflex grow`, so the map shows the biomass of the previous step | colour recomputed **after** growth, so it matches the current biomass (G4) | hand-written has a one-step lag (minor semantic error) |
 | 6 | Mean biomass | `mean(grassland collect each.biomass)`, a second pass over 2,500 cells | `total_biomass / length(grassland)` | same value, AI does less work |
+| 6b | Biomass monitors timing | `update:` runs at the start of the step, so monitors and chart show the previous step's biomass | **same lag in the first AI version**; found while testing X1 (grazing at step 0 showed "0 kg eaten"); fixed with `->` (computed when read) | **semantic error in both; fixed in AI version** |
 | 7 | Chart displays | no `type:` (default 3D; editor warning "switch to a 2d display") and redundant `refresh: every(1 #cycle)` | `type: 2d`, no refresh facet | AI better |
 | 8 | Hunting | `ask zebra at_distance kill_distance { do die; }` | identical | equal (A3) |
 | 9 | Execution order | lions act before zebras (declaration order) | same | equal |

@@ -30,8 +30,10 @@ global {
 	float zebra_grazing <- 0.5;         // X1: kg a zebra eats per step from its cell
 
 	// ---- Monitored values (O4, O5) ----
-	float total_biomass <- 0.0 update: sum(grassland collect each.biomass);
-	float mean_biomass <- 0.0 update: total_biomass / length(grassland);
+	// Computed when read (->), not with 'update:', which runs at the start of
+	// the step and would show the biomass from before grazing and growth.
+	float total_biomass -> sum(grassland collect each.biomass);
+	float mean_biomass -> total_biomass / length(grassland);
 
 	// E1: the default GAMA world is already 100 m x 100 m, so 'shape' is not redefined.
 
