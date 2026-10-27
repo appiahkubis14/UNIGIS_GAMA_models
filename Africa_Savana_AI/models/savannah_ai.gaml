@@ -14,6 +14,13 @@ model savannah_ai
 // =====================================================================
 global {
 
+	// ---- Animals (A1, A2) ----
+	int nb_lions <- 20;
+	int nb_zebras <- 20;
+	float lion_speed <- 1.0;    // m per step
+	float zebra_speed <- 1.0;   // m per step
+	float wander_amplitude <- 40.0;  // max heading change per step (degrees)
+
 	// ---- Grass (G2, G3, G4) ----
 	float initial_biomass_min <- 0.0;   // kg
 	float initial_biomass_max <- 10.0;  // kg
@@ -21,6 +28,45 @@ global {
 	float biomass_full_colour <- 30.0;  // kg at which a cell is fully dark green
 
 	// E1: the default GAMA world is already 100 m x 100 m, so 'shape' is not redefined.
+
+	// A1: random initial locations are GAMA's default for 'create'.
+	init {
+		create lion number: nb_lions;
+		create zebra number: nb_zebras;
+	}
+}
+
+// =====================================================================
+// SPECIES
+// =====================================================================
+
+// A2: shared random walk; 'wander' keeps agents inside the world.
+species animal skills: [moving] {
+	float walk_speed;
+
+	reflex walk {
+		do wander amplitude: wander_amplitude speed: walk_speed;
+	}
+}
+
+species lion parent: animal {
+	init {
+		walk_speed <- lion_speed;
+	}
+
+	aspect base {  // A4
+		draw circle(3.0) color: #orange border: #black;
+	}
+}
+
+species zebra parent: animal {
+	init {
+		walk_speed <- zebra_speed;
+	}
+
+	aspect base {  // A4
+		draw triangle(2.0) color: #grey border: #black;
+	}
 }
 
 // =====================================================================
@@ -54,6 +100,8 @@ experiment Savannah type: gui {
 	output {
 		display SavannahMap type: opengl {
 			grid grassland;
+			species zebra aspect: base;
+			species lion aspect: base;
 		}
 	}
 }
