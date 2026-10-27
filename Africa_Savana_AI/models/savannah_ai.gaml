@@ -20,6 +20,7 @@ global {
 	float lion_speed <- 1.0;    // m per step
 	float zebra_speed <- 1.0;   // m per step
 	float wander_amplitude <- 40.0;  // max heading change per step (degrees)
+	float kill_distance <- 3.0;      // A3: a lion "runs into" a zebra within its drawn size
 
 	// ---- Grass (G2, G3, G4) ----
 	float initial_biomass_min <- 0.0;   // kg
@@ -52,6 +53,13 @@ species animal skills: [moving] {
 species lion parent: animal {
 	init {
 		walk_speed <- lion_speed;
+	}
+
+	// A3: every zebra the lion runs into is killed in the same step.
+	reflex hunt {
+		ask zebra at_distance kill_distance {
+			do die;
+		}
 	}
 
 	aspect base {  // A4
