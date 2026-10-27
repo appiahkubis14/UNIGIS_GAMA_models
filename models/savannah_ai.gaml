@@ -22,6 +22,11 @@ global {
 	float wander_amplitude <- 40.0;  // max heading change per step (degrees)
 	float kill_distance <- 3.0;      // A3: a lion "runs into" a zebra within its drawn size
 
+	// ---- Lion energy (X2-X5) ----
+	float lion_initial_energy <- 50.0;
+	float lion_move_cost <- 0.5;     // energy lost per step of movement
+	float lion_energy_gain <- 20.0;  // energy gained per zebra eaten
+
 	// ---- Grass (G2, G3, G4) ----
 	float initial_biomass_min <- 0.0;   // kg
 	float initial_biomass_max <- 10.0;  // kg
@@ -52,16 +57,25 @@ global {
 // The speed is read from the global every step so that changing the
 // parameter during a run affects agents that already exist.
 species lion skills: [moving] {
+	float energy <- lion_initial_energy;  // X2
 
 	reflex walk {
 		do wander amplitude: wander_amplitude speed: lion_speed;
+		energy <- energy - lion_move_cost;  // X3
 	}
 
-	// A3: every zebra the lion runs into is killed in the same step.
+	// A3 / X4: every zebra the lion runs into is eaten in the same step.
 	reflex hunt {
-		ask zebra at_distance kill_distance {
+		list<zebra> prey <- zebra at_distance kill_distance;
+		energy <- energy + lion_energy_gain * length(prey);
+		ask prey {
 			do die;
 		}
+	}
+
+	// X5: runs after 'hunt', so a lion that eats in its last step survives.
+	reflex starve when: energy <= 0 {
+		do die;
 	}
 
 	aspect base {  // A4
@@ -122,6 +136,9 @@ experiment Savannah type: gui {
 	parameter "Zebra speed (m/step)" var: zebra_speed min: 0.1 max: 5.0 category: "Animals";
 	parameter "Grass growth (kg/step)" var: grass_growth_rate min: 0.0 max: 1.0 category: "Grass";
 	parameter "Zebra grazing (kg/step)" var: zebra_grazing min: 0.0 max: 5.0 category: "Grass";  // X6
+	parameter "Lion initial energy" var: lion_initial_energy min: 1.0 max: 200.0 category: "Lion energy";  // X6
+	parameter "Lion move cost (per step)" var: lion_move_cost min: 0.0 max: 5.0 category: "Lion energy";
+	parameter "Lion gain per zebra" var: lion_energy_gain min: 0.0 max: 100.0 category: "Lion energy";
 
 	output {
 		// O2: grass below, zebras, lions on top
@@ -139,6 +156,13 @@ experiment Savannah type: gui {
 			}
 		}
 
+		// X6
+		display LionEnergy type: 2d {
+			chart "Mean lion energy" type: series {
+				data "Mean energy" value: empty(lion) ? 0.0 : mean(lion collect each.energy) color: #orange;
+			}
+		}
+
 		// O4
 		display Grass type: 2d {
 			chart "Mean biomass per cell (kg)" type: series {
@@ -149,6 +173,7 @@ experiment Savannah type: gui {
 		// O5
 		monitor "Lions" value: length(lion);
 		monitor "Zebras" value: length(zebra);
+		monitor "Mean lion energy" value: empty(lion) ? 0.0 : mean(lion collect each.energy) with_precision 1;
 		monitor "Total biomass (kg)" value: total_biomass with_precision 1;
 		monitor "Mean biomass (kg)" value: mean_biomass with_precision 2;
 	}
