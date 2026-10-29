@@ -35,6 +35,15 @@ An extended savannah model combining agent-based and cellular automata concepts:
 
 This is the most complete ecological model in the repository and shows how ABM and CA can be combined in a single simulation.
 
+### Africa_Savana_Demography / savana_demography.gaml
+`savana_ca.gaml` extended with lion demography based on lists:
+
+- a list of lion ages, updated every step (previous age removed, current age added)
+- number, minimum, mean and maximum age reported each step (console, monitors, chart)
+- lions shaded red by their age relative to the mean age
+- lions older than 60 die, giving birth to a baby lion just before
+- prompt log in `docs/PROMPT_LOG.md`
+
 ### 3. Hello World / Hello_world.gaml
 A minimal GAML example that demonstrates:
 
