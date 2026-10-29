@@ -3,6 +3,7 @@
 Tool: Claude Code (model: Claude Opus 5.5), GAMA 2025.6.4, 2026-10-29.
 Base model: `Africa_Savana/models/savana_ca.gaml` (hand-written Savannah model).
 Result: `models/savana_demography.gaml`, checked by `models/test_demography.gaml`.
+Commit: `533ed91` (all steps below, committed together).
 
 ## Prompt given to the agent
 
